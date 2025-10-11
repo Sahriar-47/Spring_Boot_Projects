@@ -1,6 +1,5 @@
-package com.example.entity;
+package com.example.payload.response;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,17 +11,9 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "COURSE")
-public class Course {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class CourseResponse {
     private String courseName;
     private String courseDescription;
     private LocalDate courseStartDate;
     private LocalDate courseEndDate;
-    private String courseStatus;
-    private String courseId;
 }
