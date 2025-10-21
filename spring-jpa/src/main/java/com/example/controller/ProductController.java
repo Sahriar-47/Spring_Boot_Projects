@@ -4,6 +4,7 @@ import com.example.payload.request.ProductDto;
 import com.example.payload.response.ProductResponse;
 import com.example.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,27 @@ public class ProductController {
     @GetMapping("/product")
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         List<ProductResponse> productResponseList = productService.getAllProducts();
+        return new ResponseEntity<>(productResponseList, HttpStatus.OK);
+    }
+
+    @GetMapping("/product/pagination/{ofset}/{limit}")
+    public ResponseEntity<Page<ProductResponse>> getAllProductsWithPagination(
+           @PathVariable int ofset, @PathVariable int limit) {
+        Page<ProductResponse> page = productService.getAllProductsWithPagination(ofset, limit);
+        return new ResponseEntity<>(page, HttpStatus.OK);
+    }
+    @GetMapping("/product/pagination/{ofset}/{limit}/{fieldName}")
+    public ResponseEntity<Page<ProductResponse>> getAllProductsWithPaginationAndSort(@PathVariable int ofset,
+                                                                                     @PathVariable int limit,
+                                                                                     @PathVariable String fieldName) {
+        Page<ProductResponse> page = productService.getAllProductsWithPaginationAndSort(ofset, limit, fieldName);
+        return new ResponseEntity<>(page, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/product/sort/{fieldName}")
+    public ResponseEntity<List<ProductResponse>> getAllProductsSortWithField(@PathVariable String fieldName) {
+        List<ProductResponse> productResponseList = productService.getAllProductsSortWithField(fieldName);
         return new ResponseEntity<>(productResponseList, HttpStatus.OK);
     }
 

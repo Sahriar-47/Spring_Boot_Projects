@@ -1,11 +1,16 @@
 package com.example.service.impl;
 
 import com.example.entity.Product;
+import com.example.map.ProductMapper;
 import com.example.payload.request.ProductDto;
 import com.example.payload.response.ProductResponse;
 import com.example.repository.ProductRepository;
 import com.example.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -68,11 +73,33 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<ProductResponse> getAllProductsWithPagination(int ofset, int limit) {
+        Page<Product> productPage = productRepository.findAll(PageRequest.of(ofset, limit));
+        return productPage.map(ProductMapper::mapToResponse);
+    }
+
+    @Override
+    public Page<ProductResponse> getAllProductsWithPaginationAndSort(int ofset, int limit, String fieldName) {
+        Page<Product> productPage = productRepository.findAll(PageRequest.of(ofset, limit).withSort(Sort.by(fieldName).ascending()));
+        return productPage.map(ProductMapper::mapToResponse);
+    }
+
+    @Override
     public List<ProductResponse> getProductsByCategory(String category) {
         List<Product> productList = productRepository.findByProductCategory(category);
         List<ProductResponse> productResponseList = new ArrayList<>();
 
-        ProductResponse productResponse = new ProductResponse();
+        for(Product product : productList){
+            productResponseList.add(mapToResponse(product));
+        }
+        return productResponseList;
+    }
+
+    @Override
+    public List<ProductResponse> getAllProductsSortWithField(String fieldName) {
+        List<Product> productList = productRepository.findAll(Sort.by(Sort.Direction.ASC, fieldName));
+
+        List<ProductResponse> productResponseList = new ArrayList<>();
         for(Product product : productList){
             productResponseList.add(mapToResponse(product));
         }
