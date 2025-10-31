@@ -11,7 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class PatientResponse {
-    private Long id;
     private String name;
     private String gender;
     private String mobileNumber;

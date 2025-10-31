@@ -8,7 +8,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PatientRepository extends JpaRepository<Patient,Long> {
-    Patient findByInsurance(Insurance insurance);
 }
-//interface PatientDtoRepository extends JpaRepository<PatientDto,Long> {
-//}

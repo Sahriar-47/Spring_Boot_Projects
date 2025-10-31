@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class InsuranceDto {
-    private Long id;
     private String insuranceProvider;
     private LocalDate validUntil;
     private String insuranceNumber;

@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class AppointmentDto {
-    private Long id;
     private LocalDateTime appointmentDateTime;
     private String appointmentReason;
     private Long patientId;

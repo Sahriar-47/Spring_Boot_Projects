@@ -12,10 +12,9 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class DoctorDto {
-    private Long id;
     private String name;
     private String specialization;
     private String email;
-    private Set<Department> departmentIds;
-    private List<Appointment> appointmentIds;
+    private Set<Long> departmentIds;
+    private List<Long> appointmentIds;
 }

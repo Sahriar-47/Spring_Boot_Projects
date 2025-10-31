@@ -11,7 +11,6 @@ import com.example.service.InsuranceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class InsuranceServiceImpl implements InsuranceService {
@@ -25,22 +24,19 @@ public class InsuranceServiceImpl implements InsuranceService {
 
     @Override
     public InsuranceResponse createInsurance(InsuranceDto insuranceDto) {
-        //Optional<Patient> patient = patientRepository.findById(insuranceDto.getPatientId());
+        Patient patient = patientRepository.findById(insuranceDto.getPatientId())
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
 
         Insurance insurance = new Insurance();
+        insurance.setInsuranceNumber(insuranceDto.getInsuranceNumber());
+        insurance.setInsuranceProvider(insuranceDto.getInsuranceProvider());
+        insurance.setValidUntil(insuranceDto.getValidUntil());
 
-        //if(patient.isPresent()) {
-            insurance.setId(insuranceDto.getId());
-            insurance.setInsuranceNumber(insuranceDto.getInsuranceNumber());
-            insurance.setInsuranceProvider(insuranceDto.getInsuranceProvider());
-            insurance.setValidUntil(insuranceDto.getValidUntil());
-            //insurance.setPatient(patient.get());
+        insurance.setPatient(patient);
+        patient.setInsurance(insurance);
 
-            Insurance savedInsurance = insuranceRepository.save(insurance);
-            return MapToResponse.mapFromInsuranceToInsuranceResponse(savedInsurance);
-//        } else {
-//            throw new RuntimeException("Patient not found");
-//        }
+        Insurance savedInsurance = insuranceRepository.save(insurance);
+        return MapToResponse.mapFromInsuranceToInsuranceResponse(savedInsurance);
     }
 
     @Override
@@ -53,15 +49,14 @@ public class InsuranceServiceImpl implements InsuranceService {
     @Override
     public InsuranceResponse updateInsurance(InsuranceDto insuranceDto, Long insuranceId) {
         Insurance insurance = insuranceRepository.findById(insuranceId).orElseThrow(() -> new RuntimeException("Insurance not found"));
-        Optional<Patient> patient = patientRepository.findById(insuranceDto.getPatientId());
-        if(!patient.isPresent()) {
-            throw new RuntimeException("Patient not found");
-        }
+        Patient patient = patientRepository.findById(insuranceDto.getPatientId()).orElseThrow(() -> new RuntimeException("Patient not found"));
 
-        insurance.setPatient(patient.get());
         insurance.setValidUntil(insuranceDto.getValidUntil());
         insurance.setInsuranceProvider(insuranceDto.getInsuranceProvider());
         insurance.setInsuranceNumber(insuranceDto.getInsuranceNumber());
+
+        insurance.setPatient(patient);
+        patient.setInsurance(insurance);
 
         insuranceRepository.save(insurance);
         return MapToResponse.mapFromInsuranceToInsuranceResponse(insurance);
@@ -69,12 +64,18 @@ public class InsuranceServiceImpl implements InsuranceService {
 
     @Override
     public String deleteInsurance(Long insuranceId) {
-        Insurance insurance = insuranceRepository.findById(insuranceId).orElseThrow(() -> new RuntimeException("Insurance not found"));
-        Patient patient = patientRepository.findByInsurance(insurance);
-        patient.setInsurance(null);
-        patientRepository.save(patient);
+        Insurance insurance = insuranceRepository.findById(insuranceId)
+                .orElseThrow(() -> new RuntimeException("Insurance not found"));
+
+        Patient patient = insurance.getPatient();
+        if (patient != null) {
+            patient.setInsurance(null);
+            insurance.setPatient(null);
+            patientRepository.save(patient);
+        }
 
         insuranceRepository.delete(insurance);
         return "Insurance successfully deleted";
     }
+
 }

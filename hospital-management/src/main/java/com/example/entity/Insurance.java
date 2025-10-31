@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,5 +23,6 @@ public class Insurance {
     private String insuranceNumber;
 
     @OneToOne(mappedBy = "insurance")
+    @JsonManagedReference
     private Patient patient;
 }

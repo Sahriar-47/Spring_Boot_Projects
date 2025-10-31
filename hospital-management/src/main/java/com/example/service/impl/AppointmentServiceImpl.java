@@ -10,10 +10,10 @@ import com.example.repository.AppointmentRepository;
 import com.example.repository.DoctorRepository;
 import com.example.repository.PatientRepository;
 import com.example.service.AppointmentService;
+import com.example.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
@@ -31,60 +31,83 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public AppointmentResponse createAppointment(AppointmentDto appointmentDto) {
-        Optional<Patient> patient = patientRepository.findById(appointmentDto.getPatientId());
-        Optional<Doctor> doctor = doctorRepository.findById(appointmentDto.getDoctorId());
+        Appointment appointment = new Appointment();
+        appointment.setAppointmentDateTime(appointmentDto.getAppointmentDateTime());
+        appointment.setAppointmentReason(appointmentDto.getAppointmentReason());
 
-        if(patient.isPresent() &&  doctor.isPresent()){
-            Appointment appointment = new Appointment();
-            appointment.setId(appointmentDto.getId());
-            appointment.setAppointmentDateTime(appointmentDto.getAppointmentDateTime());
-            appointment.setAppointmentReason(appointmentDto.getAppointmentReason());
-            appointment.setPatient(patient.get());
-            appointment.setDoctor(doctor.get());
-
-            Appointment savedAppointment = appointmentRepository.save(appointment);
-            return MapToResponse.mapFromAppointmentToAppointmentResponse(savedAppointment);
+        if(appointmentDto.getDoctorId() != null) {
+            Doctor doctor = doctorRepository.findById(appointmentDto.getDoctorId()).orElseThrow(()->
+                    new RuntimeException("doctor not found"));
+            appointment.setDoctor(doctor);
+            doctor.getAppointmentList().add(appointment);
         } else {
-            throw new RuntimeException("Patient not found");
+            appointment.setDoctor(null);
         }
+        if(appointmentDto.getPatientId() != null) {
+            Patient patient = patientRepository.findById(appointmentDto.getPatientId()).orElseThrow(()->
+                    new  RuntimeException("patient not found"));
+            appointment.setPatient(patient);
+            patient.getAppointments().add(appointment);
+        } else {
+            appointment.setPatient(null);
+        }
+
+        Appointment savedAppointment = appointmentRepository.save(appointment);
+        return MapToResponse.mapFromAppointmentToAppointmentResponse(savedAppointment);
     }
 
     @Override
     public AppointmentResponse getAppointment(Long id) {
-        Appointment appointment = appointmentRepository.findById(id).orElse(null);
-        if(appointment == null){
-            throw new RuntimeException("Appointment not found");
-        }
-        else {
-            return MapToResponse.mapFromAppointmentToAppointmentResponse(appointment);
-        }
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()->
+                new RuntimeException("appointment not found"));
+
+        return MapToResponse.mapFromAppointmentToAppointmentResponse(appointment);
     }
 
     @Override
     public AppointmentResponse updateAppointment(AppointmentDto appointmentDto, Long id) {
-        Appointment appointment = appointmentRepository.findById(id).orElse(null);
-        if(appointment == null){
-            throw new RuntimeException("Appointment not found");
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()->
+                new RuntimeException("appointment not found"));
+
+        appointment.setAppointmentDateTime(appointmentDto.getAppointmentDateTime());
+        appointment.setAppointmentReason(appointmentDto.getAppointmentReason());
+
+        if(appointmentDto.getDoctorId() != null) {
+            Doctor doctor = doctorRepository.findById(appointmentDto.getDoctorId()).orElseThrow(()->
+                    new RuntimeException("doctor not found"));
+            appointment.setDoctor(doctor);
+            doctor.getAppointmentList().add(appointment);
         } else {
-            appointment.setAppointmentDateTime(appointmentDto.getAppointmentDateTime());
-            appointment.setAppointmentReason(appointmentDto.getAppointmentReason());
-            appointment.setPatient(patientRepository.findById(appointmentDto.getPatientId()).orElse(null));
-            appointment.setDoctor(doctorRepository.findById(appointmentDto.getDoctorId()).orElse(null));
-
-            Appointment updatedAppointment = appointmentRepository.save(appointment);
-            return MapToResponse.mapFromAppointmentToAppointmentResponse(updatedAppointment);
+            appointment.setDoctor(null);
         }
-    }
+        if(appointmentDto.getPatientId() != null) {
+            Patient patient = patientRepository.findById(appointmentDto.getPatientId()).orElseThrow(()->
+                    new RuntimeException("patient not found"));
+            appointment.setPatient(patient);
+            patient.getAppointments().add(appointment);
+        } else {
+            appointment.setPatient(null);
+        }
 
+        Appointment updatedAppointment = appointmentRepository.save(appointment);
+        return MapToResponse.mapFromAppointmentToAppointmentResponse(updatedAppointment);
+    }
 
     @Override
     public String deleteAppointment(Long id) {
-        Appointment appointment = appointmentRepository.findById(id).orElse(null);
-        if(appointment == null){
-            throw new RuntimeException("Appointment not found");
-        } else {
-            appointmentRepository.delete(appointment);
-            return "Appointment has been deleted";
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()->
+                new  RuntimeException("appointment not found"));
+
+        if(appointment.getDoctor() != null) {
+            appointment.setDoctor(null);
+            appointment.getDoctor().getAppointmentList().remove(appointment);
         }
+        if(appointment.getPatient() != null) {
+            appointment.setPatient(null);
+            appointment.getPatient().getAppointments().remove(appointment);
+        }
+
+        appointmentRepository.delete(appointment);
+        return "Appointment has been deleted";
     }
 }

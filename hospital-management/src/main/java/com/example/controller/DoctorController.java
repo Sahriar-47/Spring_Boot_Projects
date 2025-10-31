@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v4")
 public class DoctorController {
-    DoctorService doctorService;
+    private final DoctorService doctorService;
     @Autowired
     public DoctorController(DoctorService doctorService) {
         this.doctorService = doctorService;

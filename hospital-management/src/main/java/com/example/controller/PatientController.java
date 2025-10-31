@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v3")
 public class PatientController {
-    PatientService patientService;
+    private final PatientService patientService;
     @Autowired
     public PatientController(PatientService patientService) {
         this.patientService = patientService;

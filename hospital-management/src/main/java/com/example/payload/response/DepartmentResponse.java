@@ -11,7 +11,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class DepartmentResponse {
-    private Long id;
     private String name;
-    private Set<Doctor> doctorIds;
+    private Set<Long> doctorIds;
 }

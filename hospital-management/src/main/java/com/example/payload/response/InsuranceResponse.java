@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class InsuranceResponse {
-    private Long id;
     private String insuranceProvider;
     private LocalDate validUntil;
     private String insuranceNumber;
