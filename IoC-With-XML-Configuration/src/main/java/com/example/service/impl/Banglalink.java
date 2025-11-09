@@ -1,5 +1,7 @@
 package com.example.service.impl;
 
+import com.example.service.Sim;
+
 public class Banglalink implements Sim {
     @Override
     public void calling() {

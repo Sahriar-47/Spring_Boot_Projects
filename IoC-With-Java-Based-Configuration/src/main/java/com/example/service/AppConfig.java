@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
     @Bean
     public Sim sim () {
-        return new Airtel();
+        return new Banglalink();
     }
 }
