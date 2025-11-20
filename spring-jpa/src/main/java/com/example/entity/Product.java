@@ -1,6 +1,5 @@
 package com.example.entity;
 
-import com.example.payload.request.ProductDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

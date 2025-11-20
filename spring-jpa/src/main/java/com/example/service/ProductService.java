@@ -1,10 +1,8 @@
 package com.example.service;
 
-import com.example.entity.Product;
 import com.example.payload.request.ProductDto;
 import com.example.payload.response.ProductResponse;
 import org.springframework.data.domain.Page;
-
 import java.util.List;
 
 public interface ProductService {
